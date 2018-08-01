@@ -37,6 +37,7 @@ import (
 	stackdriver "istio.io/istio/mixer/adapter/stackdriver"
 	statsd "istio.io/istio/mixer/adapter/statsd"
 	stdio "istio.io/istio/mixer/adapter/stdio"
+	turbo "istio.io/istio/mixer/adapter/turbo"
 	adptr "istio.io/istio/mixer/pkg/adapter"
 )
 
@@ -63,5 +64,6 @@ func Inventory() []adptr.InfoFn {
 		stackdriver.GetInfo,
 		statsd.GetInfo,
 		stdio.GetInfo,
+		turbo.GetInfo,
 	}
 }

@@ -1,0 +1,41 @@
+# instance configuration for template 'metric'
+apiVersion: "config.istio.io/v1alpha2"
+kind: metric
+metadata:
+ name: turbometrics
+ namespace: istio-system
+spec:
+ value: "1"
+ dimensions:
+   latency: response.duration | "0ms"
+   req_size: request.size | 0
+   resp_size: response.size | 0
+   source_ip: source.ip | ip("0.0.0.0")
+   destination_ip: destination.ip | ip("0.0.0.0")
+
+---
+# handler configuration for adapter 'metric'
+apiVersion: "config.istio.io/v1alpha2"
+kind: turbo
+metadata:
+ name: turboTest
+ namespace: istio-system
+spec:
+ url: "https://localhost:9400"
+ user: "administrator"
+ password: "a"
+ target_version: "6.2.0-SNAPSHOT"
+---
+# rule to dispatch to your handler
+apiVersion: "config.istio.io/v1alpha2"
+kind: rule
+metadata:
+ name: turborule
+ namespace: istio-system
+spec:
+ match: "true"
+ actions:
+ - handler: turboTest.turbo
+   instances:
+   - turbometrics.metric
+   
