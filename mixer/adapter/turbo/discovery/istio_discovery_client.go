@@ -1,19 +1,11 @@
 package discovery
 
 import (
-<<<<<<< HEAD
-	sdkprobe "github.com/turbonomic/turbo-go-sdk/pkg/probe"
-	"github.com/golang/glog"
-	"github.com/turbonomic/turbo-go-sdk/pkg/proto"
-	"istio.io/istio/mixer/adapter/turbo/registration"
-	"github.com/turbonomic/turbo-go-sdk/pkg/builder"
-=======
 	"github.com/golang/glog"
 	"github.com/turbonomic/turbo-go-sdk/pkg/builder"
 	sdkprobe "github.com/turbonomic/turbo-go-sdk/pkg/probe"
 	"github.com/turbonomic/turbo-go-sdk/pkg/proto"
 	"istio.io/istio/mixer/adapter/turbo/registration"
->>>>>>> First edition of the Turbonomic Istio Mixer adapter.
 )
 
 const (

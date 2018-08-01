@@ -1,15 +1,6 @@
 /*
 	The registration client is responsible for the registering the k8s master info with the
 	Turbo.
-<<<<<<< HEAD
- */
-package registration
-
-import (
-	"github.com/turbonomic/turbo-go-sdk/pkg/builder"
-	"github.com/turbonomic/turbo-go-sdk/pkg/proto"
-	"github.com/golang/glog"
-=======
 */
 package registration
 
@@ -17,7 +8,6 @@ import (
 	"github.com/golang/glog"
 	"github.com/turbonomic/turbo-go-sdk/pkg/builder"
 	"github.com/turbonomic/turbo-go-sdk/pkg/proto"
->>>>>>> First edition of the Turbonomic Istio Mixer adapter.
 )
 
 const (
@@ -29,21 +19,12 @@ const (
 
 /*
 	The registration client.
-<<<<<<< HEAD
- */
-=======
 */
->>>>>>> First edition of the Turbonomic Istio Mixer adapter.
 type IstioRegistrationClient struct {
 }
 
 func NewIstioRegistrationClient() *IstioRegistrationClient {
-<<<<<<< HEAD
-	return &IstioRegistrationClient{
-	}
-=======
 	return &IstioRegistrationClient{}
->>>>>>> First edition of the Turbonomic Istio Mixer adapter.
 }
 
 func (regClient *IstioRegistrationClient) GetSupplyChainDefinition() []*proto.TemplateDTO {
@@ -100,12 +81,7 @@ func (regClient *IstioRegistrationClient) addActionPolicy(ab *builder.ActionPoli
 
 func (regClient *IstioRegistrationClient) GetEntityMetadata() []*proto.EntityIdentityMetadata {
 	result := []*proto.EntityIdentityMetadata{}
-<<<<<<< HEAD
-	entities := []proto.EntityDTO_EntityType{
-	}
-=======
 	entities := []proto.EntityDTO_EntityType{}
->>>>>>> First edition of the Turbonomic Istio Mixer adapter.
 	for _, etype := range entities {
 		meta := regClient.newIdMetaData(etype, []string{propertyId})
 		result = append(result, meta)

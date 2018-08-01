@@ -10,13 +10,7 @@ type Config struct {
 }
 
 func NewVMTConfig() *Config {
-<<<<<<< HEAD
-	cfg := &Config{
-	}
-	return cfg
-=======
 	return &Config{}
->>>>>>> First edition of the Turbonomic Istio Mixer adapter.
 }
 
 func (c *Config) WithTapSpec(spec *discovery.IstioTAPServiceSpec) *Config {
