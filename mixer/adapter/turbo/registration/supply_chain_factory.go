@@ -1,6 +1,10 @@
 /*
 	The supply chain factory is responsible for creation of the supply chain to be passed onto to the Turbo.
+<<<<<<< HEAD
  */
+=======
+*/
+>>>>>>> First edition of the Turbonomic Istio Mixer adapter.
 package registration
 
 import (

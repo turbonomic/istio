@@ -4,11 +4,19 @@ import (
 	"errors"
 	"fmt"
 
+<<<<<<< HEAD
 	"github.com/turbonomic/turbo-go-sdk/pkg/service"
 	"github.com/turbonomic/turbo-go-sdk/pkg/probe"
 	"istio.io/istio/mixer/adapter/turbo/registration"
 	"istio.io/istio/mixer/adapter/turbo/action"
 	"istio.io/istio/mixer/adapter/turbo/discovery"
+=======
+	"github.com/turbonomic/turbo-go-sdk/pkg/probe"
+	"github.com/turbonomic/turbo-go-sdk/pkg/service"
+	"istio.io/istio/mixer/adapter/turbo/action"
+	"istio.io/istio/mixer/adapter/turbo/discovery"
+	"istio.io/istio/mixer/adapter/turbo/registration"
+>>>>>>> First edition of the Turbonomic Istio Mixer adapter.
 )
 
 type IstioTAPService struct {

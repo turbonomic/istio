@@ -1,8 +1,13 @@
 package discovery
 
 import (
+<<<<<<< HEAD
 	"fmt"
 	"encoding/json"
+=======
+	"encoding/json"
+	"fmt"
+>>>>>>> First edition of the Turbonomic Istio Mixer adapter.
 	"github.com/turbonomic/turbo-go-sdk/pkg/service"
 	"os"
 )

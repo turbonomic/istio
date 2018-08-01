@@ -1,9 +1,15 @@
 package discovery
 
 import (
+<<<<<<< HEAD
 	"sync"
 	"errors"
 	"fmt"
+=======
+	"errors"
+	"fmt"
+	"sync"
+>>>>>>> First edition of the Turbonomic Istio Mixer adapter.
 )
 
 type (
@@ -32,8 +38,12 @@ func NewMetricHandler() *MetricHandler {
 
 // Creates a new metric
 func (handler *MetricHandler) NewMetricBuilder() *Metric {
+<<<<<<< HEAD
 	return &Metric{
 	}
+=======
+	return &Metric{}
+>>>>>>> First edition of the Turbonomic Istio Mixer adapter.
 }
 
 // Add the metric

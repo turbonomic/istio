@@ -10,9 +10,13 @@ type ActionHandler struct {
 }
 
 func NewIstioActionHandler() *ActionHandler {
+<<<<<<< HEAD
 	handler := &ActionHandler{
 	}
 	return handler
+=======
+	return &ActionHandler{}
+>>>>>>> First edition of the Turbonomic Istio Mixer adapter.
 }
 
 func (h *ActionHandler) unsupported() *proto.ActionResult {

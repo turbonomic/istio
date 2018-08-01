@@ -9,9 +9,15 @@ import (
 	"syscall"
 
 	"istio.io/istio/mixer/adapter/turbo/config"
+<<<<<<< HEAD
 	"istio.io/istio/mixer/pkg/adapter"
 	"istio.io/istio/mixer/template/metric"
 	"istio.io/istio/mixer/adapter/turbo/discovery"
+=======
+	"istio.io/istio/mixer/adapter/turbo/discovery"
+	"istio.io/istio/mixer/pkg/adapter"
+	"istio.io/istio/mixer/template/metric"
+>>>>>>> First edition of the Turbonomic Istio Mixer adapter.
 	"time"
 )
 
