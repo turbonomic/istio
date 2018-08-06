@@ -62,7 +62,7 @@ func (client *IstioDiscoveryClient) Validate(accountValues []*proto.AccountValue
 	return validationResponse, nil
 }
 
-// DiscoverTopology receives a discovery request from server and start probing the k8s.
+// DiscoverTopology receives a discovery request from server and returns the Istio mixer metrics.
 // This is a part of the interface that gets registered with and is invoked asynchronously by the GO SDK Probe.
 func (client *IstioDiscoveryClient) Discover(accountValues []*proto.AccountValue) (*proto.DiscoveryResponse, error) {
 	newDiscoveryResultDTOs, err := client.doDiscover()
