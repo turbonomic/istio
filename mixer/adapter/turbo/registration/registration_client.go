@@ -45,11 +45,11 @@ func (regClient *IstioRegistrationClient) GetAccountDefinition() []*proto.Accoun
 	acctDefProps = append(acctDefProps, targetIDAcctDefEntry)
 	// username
 	usernameAcctDefEntry := builder.NewAccountDefEntryBuilder(Username, "Username",
-		"Username of the Kubernetes master", ".*", false, false).Create()
+		"Istio Mixer adapter username", ".*", false, false).Create()
 	acctDefProps = append(acctDefProps, usernameAcctDefEntry)
 	// password
 	passwordAcctDefEntry := builder.NewAccountDefEntryBuilder(Password, "Password",
-		"Password of the Kubernetes master", ".*", false, true).Create()
+		"Istio Mixer adapter password", ".*", false, true).Create()
 	acctDefProps = append(acctDefProps, passwordAcctDefEntry)
 	return acctDefProps
 }
@@ -59,24 +59,7 @@ func (regClient *IstioRegistrationClient) GetIdentifyingFields() string {
 }
 
 func (regClient *IstioRegistrationClient) GetActionPolicy() []*proto.ActionPolicyDTO {
-	actionPolicyBuilder := builder.NewActionPolicyBuilder()
-	//1. containerPod: move, provision; not resize;
-	pod := proto.EntityDTO_CONTAINER_POD
-	podPolicy := make(map[proto.ActionItemDTO_ActionType]proto.ActionPolicyDTO_ActionCapability)
-	podPolicy[proto.ActionItemDTO_MOVE] = proto.ActionPolicyDTO_SUPPORTED
-	podPolicy[proto.ActionItemDTO_PROVISION] = proto.ActionPolicyDTO_SUPPORTED
-	podPolicy[proto.ActionItemDTO_RIGHT_SIZE] = proto.ActionPolicyDTO_NOT_SUPPORTED
-	regClient.addActionPolicy(actionPolicyBuilder, pod, podPolicy)
-	return actionPolicyBuilder.Create()
-}
-
-func (regClient *IstioRegistrationClient) addActionPolicy(ab *builder.ActionPolicyBuilder,
-	entity proto.EntityDTO_EntityType,
-	policies map[proto.ActionItemDTO_ActionType]proto.ActionPolicyDTO_ActionCapability) {
-
-	for action, policy := range policies {
-		ab.WithEntityActions(entity, action, policy)
-	}
+	return builder.NewActionPolicyBuilder().Create()
 }
 
 func (regClient *IstioRegistrationClient) GetEntityMetadata() []*proto.EntityIdentityMetadata {

@@ -15,7 +15,7 @@ type IstioTAPService struct {
 	*service.TAPService
 }
 
-func NewKubernetesTAPService(config *Config) (*IstioTAPService, error) {
+func NewIstioTAPService(config *Config) (*IstioTAPService, error) {
 	if config == nil || config.tapSpec == nil {
 		return nil, errors.New("invalid IstioTAPServiceConfig")
 	}
@@ -37,7 +37,6 @@ func NewKubernetesTAPService(config *Config) (*IstioTAPService, error) {
 			WithTurboProbe(probe.NewProbeBuilder(config.tapSpec.TargetType, config.tapSpec.ProbeCategory).
 				WithDiscoveryOptions(probe.FullRediscoveryIntervalSecondsOption(int32(config.DiscoveryIntervalSec))).
 				RegisteredBy(registrationClient).
-				WithActionPolicies(registrationClient).
 				WithEntityMetadata(registrationClient).
 				DiscoversTarget(config.tapSpec.TargetIdentifier, discoveryClient).
 				ExecutesActionsBy(actionHandler)).

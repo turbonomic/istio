@@ -1,4 +1,4 @@
-//go:generate $GOPATH/src/istio.io/istio/bin/mixer_codegen.sh -f mixer/adapter/turbo/config/config.proto
+//go:generate $GOPATH/src/istio.io/istio/bin/mixer_codegen.sh -f mixer/adapter/turbo/config/config.proto -x "-n turbo -t metric"
 package turbo
 
 import (
@@ -13,6 +13,8 @@ import (
 	"istio.io/istio/mixer/pkg/adapter"
 	"istio.io/istio/mixer/template/metric"
 	"time"
+	"strings"
+	"github.com/pkg/errors"
 )
 
 const (
@@ -44,6 +46,34 @@ var (
 
 // adapter.HandlerBuilder#Build
 func (b *builder) Build(ctx context.Context, env adapter.Env) (adapter.Handler, error) {
+	host, err := os.Hostname()
+	if err != nil {
+		env.Logger().Errorf("Error retrieving host name: %s\n", err)
+		return nil, err
+	}
+	if !strings.Contains(host, "istio-telemetry") {
+		env.Logger().Errorf("Unsupported istio mixer: %s\n", host)
+		return nil, errors.New("Unsupported istio mixer")
+	}
+	// Initialize the probe part.
+	// Convert to JSON, so that we can parse that:
+	tapSpec, err := b.parseConfig()
+	if err != nil {
+		return nil, err
+	}
+	b.metricHandler = discovery.NewMetricHandler()
+	vmtConfig := NewVMTConfig()
+	vmtConfig.WithDiscoveryInterval(discoveryInterval).
+		WithTapSpec(tapSpec).WithMetricHandler(b.metricHandler)
+	tapSvc, tapErr := NewIstioTAPService(vmtConfig)
+	if tapErr != nil {
+		return nil, err
+	}
+	b.tapSvc = tapSvc
+	// Disconnect from Turbonomic server when mixer is shutdown
+	handleExit(func() { tapSvc.DisconnectFromTurbo() })
+	// Connect
+	tapSvc.ConnectToTurbo()
 	return &handler{
 		bld:         b,
 		metricTypes: b.metricTypes,
@@ -54,28 +84,9 @@ func (b *builder) Build(ctx context.Context, env adapter.Env) (adapter.Handler, 
 // adapter.HandlerBuilder#SetAdapterConfig
 func (b *builder) SetAdapterConfig(cfg adapter.Config) {
 	b.cfg = cfg.(*config.Params)
-	// Initialize the probe part.
-	// Convert to JSON, so that we can parse that:
-	tapSpec, err := b.parseConfig()
-	if err != nil {
-		return
-	}
-	b.metricHandler = discovery.NewMetricHandler()
-	vmtConfig := NewVMTConfig()
-	vmtConfig.WithDiscoveryInterval(discoveryInterval).
-		WithTapSpec(tapSpec).WithMetricHandler(b.metricHandler)
-	tapSvc, tapErr := NewKubernetesTAPService(vmtConfig)
-	if tapErr != nil {
-		return
-	}
-	b.tapSvc = tapSvc
-	// Disconnect from Turbo server when Kubeturbo is shutdown
-	handleExit(func() { tapSvc.DisconnectFromTurbo() })
-	// Connect
-	go tapSvc.ConnectToTurbo()
 }
 
-// handleExit disconnects the tap service from Turbo service when Kubeturbo is shotdown
+// handleExit disconnects the tap service from Turbo service when Istio is shutdown
 func handleExit(disconnectFunc disconnectFromTurboFunc) {
 	sigChan := make(chan os.Signal)
 	signal.Notify(sigChan,
@@ -88,8 +99,6 @@ func handleExit(disconnectFunc disconnectFromTurboFunc) {
 	go func() {
 		select {
 		case <-sigChan:
-			// Close the mediation container including the endpoints. It avoids the
-			// invalid endpoints remaining in the server side. See OM-28801.
 			disconnectFunc()
 		}
 	}()
@@ -106,7 +115,9 @@ func (b *builder) parseConfig() (*discovery.IstioTAPServiceSpec, error) {
 }
 
 // adapter.HandlerBuilder#Validate
-func (b *builder) Validate() (ce *adapter.ConfigErrors) { return nil }
+func (b *builder) Validate() (ce *adapter.ConfigErrors) {
+	return
+}
 
 // metric.HandlerBuilder#SetMetricTypes
 func (b *builder) SetMetricTypes(types map[string]*metric.Type) {
@@ -151,8 +162,6 @@ func (h *handler) HandleMetric(ctx context.Context, insts []*metric.Instance) er
 
 // adapter.Handler#Close
 func (h *handler) Close() error {
-	// Close the mediation container including the endpoints. It avoids the
-	// invalid endpoints remaining in the server side. See OM-28801.
 	go h.bld.tapSvc.DisconnectFromTurbo()
 	return nil
 }
