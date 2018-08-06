@@ -37,6 +37,8 @@ func (regClient *IstioRegistrationClient) GetSupplyChainDefinition() []*proto.Te
 	return supplyChain
 }
 
+// Returns the account definitions.
+// The username/password fields are dummy ones at the moment.
 func (regClient *IstioRegistrationClient) GetAccountDefinition() []*proto.AccountDefEntry {
 	var acctDefProps []*proto.AccountDefEntry
 	// target ID
@@ -54,14 +56,19 @@ func (regClient *IstioRegistrationClient) GetAccountDefinition() []*proto.Accoun
 	return acctDefProps
 }
 
+// Returns the single identifying field to be used by the Turbonomic server.
 func (regClient *IstioRegistrationClient) GetIdentifyingFields() string {
 	return TargetIdentifierField
 }
 
+// Required by the Turbonomic GO SDK, but not needed here.
+// Returning empty one.
 func (regClient *IstioRegistrationClient) GetActionPolicy() []*proto.ActionPolicyDTO {
 	return builder.NewActionPolicyBuilder().Create()
 }
 
+// We only need 'id' field for the entity identity metadata.
+// So, return this one.
 func (regClient *IstioRegistrationClient) GetEntityMetadata() []*proto.EntityIdentityMetadata {
 	result := []*proto.EntityIdentityMetadata{}
 	entities := []proto.EntityDTO_EntityType{}

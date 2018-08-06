@@ -15,21 +15,22 @@ type IstioTAPService struct {
 	*service.TAPService
 }
 
+// Creates new adapter <-> Turbonomic server bridge
 func NewIstioTAPService(config *Config) (*IstioTAPService, error) {
 	if config == nil || config.tapSpec == nil {
 		return nil, errors.New("invalid IstioTAPServiceConfig")
 	}
 
-	// Kubernetes Probe Registration Client
+	// Istio Probe Registration Client
 	registrationClient := registration.NewIstioRegistrationClient()
 
 	// Istio Probe Discovery Client
 	discoveryClient := discovery.NewIstioDiscoveryClient(config.tapSpec, config.metricHandler)
 
-	// Kubernetes Probe Action Execution Client
+	// Istio Probe Action Execution Client
 	actionHandler := action.NewIstioActionHandler()
 
-	// The KubeTurbo TAP Service that will register the kubernetes target with the
+	// The Istio TAP Service that will register the istio mixer adapter target with the
 	// Turbonomic server and await for validation, discovery, action execution requests
 	tapService, err :=
 		service.NewTAPServiceBuilder().
