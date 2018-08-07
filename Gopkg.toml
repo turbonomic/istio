@@ -332,6 +332,10 @@ ignored = [
   name = "k8s.io/kubernetes"
   version = "v1.10.4"
 
+[[constraint]]
+  branch = "master"
+  name = "github.com/turbonomic/turbo-go-sdk"
+
 [prune]
   go-tests = true
   unused-packages = true

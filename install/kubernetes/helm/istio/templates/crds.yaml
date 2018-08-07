@@ -614,6 +614,29 @@ spec:
 kind: CustomResourceDefinition
 apiVersion: apiextensions.k8s.io/v1beta1
 metadata:
+  name: turboes.config.istio.io
+  annotations:
+    "helm.sh/hook": crd-install
+  labels:
+    app: mixer
+    package: turbo
+    istio: mixer-adapter
+spec:
+  group: config.istio.io
+  names:
+    kind: turbo
+    plural: turboes
+    singular: turbo
+    categories:
+    - istio-io
+    - policy-istio-io
+  scope: Namespaced
+  version: v1alpha2
+---
+
+kind: CustomResourceDefinition
+apiVersion: apiextensions.k8s.io/v1beta1
+metadata:
   name: stackdrivers.config.istio.io
   annotations:
     "helm.sh/hook": crd-install

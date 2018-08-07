@@ -1,0 +1,63 @@
+---
+title: Turbo
+description: Adapter that exposes Istio metrics for ingestion by a Turbo instance.
+location: TBD
+layout: protoc-gen-docs
+generator: protoc-gen-docs
+aliases:
+  - TBD
+number_of_entries: 1
+---
+<p>The <code>turbo</code> adapter collects Istio metrics and makes them available to
+<a href="https://www.turbonomic.com">Turbo</a>.</p>
+
+<p>This adapter supports the <a href="https://istio.io/docs/reference/config/policy-and-telemetry/templates/metric/">metric template</a>.</p>
+
+<h2 id="Params">Params</h2>
+<section>
+<p>Configuration format for the <code>turbo</code> adapter.</p>
+
+<table class="message-fields">
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr id="Params-url">
+<td><code>url</code></td>
+<td><code>string</code></td>
+<td>
+<p>The Turbo URL</p>
+
+</td>
+</tr>
+<tr id="Params-user">
+<td><code>user</code></td>
+<td><code>string</code></td>
+<td>
+<p>The admin user name</p>
+
+</td>
+</tr>
+<tr id="Params-password">
+<td><code>password</code></td>
+<td><code>string</code></td>
+<td>
+<p>The admin password</p>
+
+</td>
+</tr>
+<tr id="Params-target_version">
+<td><code>targetVersion</code></td>
+<td><code>string</code></td>
+<td>
+<p>The target version</p>
+
+</td>
+</tr>
+</tbody>
+</table>
+</section>

@@ -1,0 +1,35 @@
+syntax = "proto3";
+
+// $title: Turbo
+// $description: Adapter that exposes Istio metrics for ingestion by a Turbo instance.
+// $location: TBD
+// $front_matter: aliases:
+// $front_matter:   - TBD
+
+// The `turbo` adapter collects Istio metrics and makes them available to
+// [Turbo](https://www.turbonomic.com).
+//
+// This adapter supports the [metric template](https://istio.io/docs/reference/config/policy-and-telemetry/templates/metric/).
+package adapter.turbo.config;
+
+import "gogoproto/gogo.proto";
+
+option go_package="config";
+option (gogoproto.goproto_getters_all) = false;
+option (gogoproto.equal_all) = false;
+option (gogoproto.gostring_all) = false;
+
+// Configuration format for the `turbo` adapter.
+message Params {
+    // The Turbo URL
+    string url = 1;
+
+    // The admin user name
+    string user = 2;
+
+    // The admin password
+    string password = 3;
+
+    // The target version
+    string target_version = 4;
+}

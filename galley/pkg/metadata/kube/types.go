@@ -205,6 +205,17 @@ func init() {
 	})
 
 	b.Add(kube.ResourceSpec{
+		Kind:      "turbo",
+		ListKind:  "turboList",
+		Singular:  "turbo",
+		Plural:    "turboes",
+		Version:   "v1alpha2",
+		Group:     "config.istio.io",
+		Target:    metadata.Types.Get("type.googleapis.com/istio.mcp.v1alpha1.extensions.LegacyMixerResource"),
+		Converter: converter.Get("legacy-mixer-resource"),
+	})
+
+	b.Add(kube.ResourceSpec{
 		Kind:      "signalfx",
 		ListKind:  "signalfxList",
 		Singular:  "signalfx",

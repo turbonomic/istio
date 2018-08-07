@@ -306,6 +306,16 @@ resources:
     converter:   "legacy-mixer-resource"
     protoPackage: "istio.io/istio/galley/pkg/kube/converter/legacy"
 
+  - kind:        "turbo"
+    singular:    "turbo"
+    plural:      "turboes"
+    group:       "config.istio.io"
+    version:     "v1alpha2"
+    proto:       "istio.mcp.v1alpha1.extensions.LegacyMixerResource"
+    gogo:        true
+    converter:   "legacy-mixer-resource"
+    protoPackage: "istio.io/istio/galley/pkg/kube/converter/legacy"
+
   - kind:        "stackdriver"
     singular:    "stackdriver"
     plural:      "stackdrivers"
