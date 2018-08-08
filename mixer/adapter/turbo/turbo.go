@@ -132,15 +132,34 @@ func (h *handler) buildMetric(dimensions map[string]interface{}) *discovery.Metr
 	for key, value := range dimensions {
 		switch key {
 		case "source_ip":
-			builder = builder.WithSource(value.(string))
+			v, ok := value.(string)
+			if !ok {
+				return h.bld.metricHandler.NewMetricBuilder()
+			}
+			builder = builder.WithSource(v)
 		case "destination_ip":
-			builder = builder.WithDestination(value.(string))
+			v, ok := value.(string)
+			if !ok {
+				return h.bld.metricHandler.NewMetricBuilder()
+			}
+			builder = builder.WithDestination(v)
 		case "req_size":
-			builder = builder.WithTransmittedAmount(value.(int64))
+			v, ok := value.(int64)
+			if !ok {
+				return h.bld.metricHandler.NewMetricBuilder()
+			}
+			builder = builder.WithTransmittedAmount(v)
 		case "resp_size":
-			builder = builder.WithReceivedAmount(value.(int64))
+			v, ok := value.(int64)
+			if !ok {
+				return h.bld.metricHandler.NewMetricBuilder()
+			}
+			builder = builder.WithReceivedAmount(v)
 		case "latency":
-			duration := value.(time.Duration)
+			duration, ok := value.(time.Duration)
+			if !ok {
+				return h.bld.metricHandler.NewMetricBuilder()
+			}
 			builder = builder.WithDuration(int(duration.Nanoseconds() / 1000))
 		}
 	}

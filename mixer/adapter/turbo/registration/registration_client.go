@@ -32,7 +32,6 @@ func (regClient *IstioRegistrationClient) GetSupplyChainDefinition() []*proto.Te
 	supplyChain, err := supplyChainFactory.createSupplyChain()
 	if err != nil {
 		glog.Errorf("Failed to create supply chain: %v", err)
-		// TODO error handling
 	}
 	return supplyChain
 }
@@ -67,29 +66,7 @@ func (regClient *IstioRegistrationClient) GetActionPolicy() []*proto.ActionPolic
 	return builder.NewActionPolicyBuilder().Create()
 }
 
-// We only need 'id' field for the entity identity metadata.
-// So, return this one.
+// We don't deal with Service Entities, so we return nothing here.
 func (regClient *IstioRegistrationClient) GetEntityMetadata() []*proto.EntityIdentityMetadata {
-	result := []*proto.EntityIdentityMetadata{}
-	entities := []proto.EntityDTO_EntityType{}
-	for _, etype := range entities {
-		meta := regClient.newIdMetaData(etype, []string{propertyId})
-		result = append(result, meta)
-	}
-	return result
-}
-
-func (regClient *IstioRegistrationClient) newIdMetaData(etype proto.EntityDTO_EntityType, names []string) *proto.EntityIdentityMetadata {
-	data := make([]*proto.EntityIdentityMetadata_PropertyMetadata, 0, 100)
-	for _, name := range names {
-		dat := &proto.EntityIdentityMetadata_PropertyMetadata{
-			Name: &name,
-		}
-		data = append(data, dat)
-	}
-	result := &proto.EntityIdentityMetadata{
-		EntityType:            &etype,
-		NonVolatileProperties: data,
-	}
-	return result
+	return []*proto.EntityIdentityMetadata{}
 }
