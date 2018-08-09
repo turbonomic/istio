@@ -73,7 +73,7 @@ func (b *builder) Build(ctx context.Context, env adapter.Env) (adapter.Handler, 
 	// Disconnect from Turbonomic server when mixer is shutdown
 	handleExit(func() { tapSvc.DisconnectFromTurbo() })
 	// Connect
-	tapSvc.ConnectToTurbo()
+	go tapSvc.ConnectToTurbo()
 	return &handler{
 		bld:         b,
 		metricTypes: b.metricTypes,
