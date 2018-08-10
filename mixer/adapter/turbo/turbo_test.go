@@ -88,7 +88,6 @@ func TestBuilder_SetMetricTypes(t *testing.T) {
 	b := &builder{metricHandler: discovery.NewMetricHandler()}
 	metricTypes := make(map[string]*metric.Type)
 	b.SetMetricTypes(metricTypes)
-	assert.Equal(t, b.metricTypes, metricTypes)
 }
 
 func TestParseConfig(t *testing.T) {
@@ -114,6 +113,37 @@ func TestBuilder_Build(t *testing.T) {
 	env := test.NewEnv(t)
 	_, err := b.Build(nil, env)
 	assert.Equal(t, err, nil)
+}
+
+func TestBuilder_Build_Bad_Param(t *testing.T) {
+	b := &builder{metricHandler: discovery.NewMetricHandler()}
+	cfg := new(config.Params)
+	cfg.Url = "abcdef"
+	cfg.User = "user"
+	cfg.Password = "Passwd"
+	cfg.TargetVersion = "1.0.0"
+	b.SetAdapterConfig(cfg)
+	env := test.NewEnv(t)
+	_, err := b.Build(nil, env)
+	if err == nil {
+		t.Errorf("Should have been an error")
+	}
+}
+
+func TestBuilder_Build_Bad_Host(t *testing.T) {
+	b := &builder{metricHandler: discovery.NewMetricHandler()}
+	cfg := new(config.Params)
+	cfg.Url = "https://abcdef"
+	cfg.User = "user"
+	cfg.Password = "Passwd"
+	cfg.TargetVersion = "1.0.0"
+	b.SetAdapterConfig(cfg)
+	env := test.NewEnv(t)
+	allowedHost = ":::No:::Such:::Host"
+	_, err := b.Build(nil, env)
+	if err == nil {
+		t.Errorf("Should have been an error")
+	}
 }
 
 // Borrows Mock logger.

@@ -68,6 +68,7 @@ func (client *IstioDiscoveryClient) Discover(accountValues []*proto.AccountValue
 	newDiscoveryResultDTOs, err := client.doDiscover()
 	if err != nil {
 		glog.Errorf("Failed to obtain Istio information: %s", err)
+		return nil, err
 	}
 	discoveryResponse := &proto.DiscoveryResponse{
 		FlowDTO: newDiscoveryResultDTOs,
@@ -89,7 +90,6 @@ func (client *IstioDiscoveryClient) doDiscover() ([]*proto.FlowDTO, error) {
 			Transmitted(m.tx).
 			FlowAmount((m.amount / float64(m.duration)) / KBPS).Create()
 		if err != nil {
-			glog.Errorf("failed to build Flow DTOs: %s", err)
 			return nil, err
 		}
 		flows = append(flows, flow)

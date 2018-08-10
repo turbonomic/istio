@@ -63,7 +63,6 @@ func constructMetrics(h *MetricHandler) {
 	h.Add(m1)
 }
 
-
 func TestIstioDiscoveryClient_Discover(t *testing.T) {
 	cfgMap := fmt.Sprintf(`{"communicationConfig": {
                                         "serverMeta": {"version": "1", "turboServer": "https://localhost"}, 

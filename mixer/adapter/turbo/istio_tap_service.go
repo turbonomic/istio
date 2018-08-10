@@ -43,7 +43,7 @@ func NewIstioTAPService(config *Config) (*IstioTAPService, error) {
 				ExecutesActionsBy(actionHandler)).
 			Create()
 	if err != nil {
-		return nil, fmt.Errorf("error when creating Istio TAPService: %s", err)
+		return nil, fmt.Errorf("error creating Istio TAPService: %s", err)
 	}
 	return &IstioTAPService{tapService}, nil
 }
