@@ -24,16 +24,14 @@ const (
 type (
 	builder struct {
 		// maps instance_name to collector.
-		metricTypes   map[string]*metric.Type
 		tapSvc        *IstioTAPService
 		cfg           *config.Params
 		metricHandler *discovery.MetricHandler
 	}
 
 	handler struct {
-		bld         *builder
-		metricTypes map[string]*metric.Type
-		logger      adapter.Logger
+		bld    *builder
+		logger adapter.Logger
 	}
 )
 
@@ -42,6 +40,10 @@ type disconnectFromTurboFunc func()
 var (
 	_ metric.HandlerBuilder = &builder{}
 	_ metric.Handler        = &handler{}
+	// Make it a variable for the unit testing purposes.
+	// In Istio 1.0, the Mixer component gets deployed twice, yet we can only work with the telemetry part.
+	// The only way I found to do it was to query and filter by the host name.
+	allowedHost = "istio-telemetry"
 )
 
 // adapter.HandlerBuilder#Build
@@ -51,7 +53,7 @@ func (b *builder) Build(ctx context.Context, env adapter.Env) (adapter.Handler, 
 		env.Logger().Errorf("Error retrieving host name: %s\n", err)
 		return nil, err
 	}
-	if !strings.Contains(host, "istio-telemetry") {
+	if !strings.Contains(host, allowedHost) {
 		env.Logger().Errorf("Unsupported istio mixer: %s\n", host)
 		return nil, errors.New("Unsupported istio mixer")
 	}
@@ -73,11 +75,10 @@ func (b *builder) Build(ctx context.Context, env adapter.Env) (adapter.Handler, 
 	// Disconnect from Turbonomic server when mixer is shutdown
 	handleExit(func() { tapSvc.DisconnectFromTurbo() })
 	// Connect
-	tapSvc.ConnectToTurbo()
+	go tapSvc.ConnectToTurbo()
 	return &handler{
-		bld:         b,
-		metricTypes: b.metricTypes,
-		logger:      env.Logger(),
+		bld:    b,
+		logger: env.Logger(),
 	}, nil
 }
 
@@ -121,7 +122,6 @@ func (b *builder) Validate() (ce *adapter.ConfigErrors) {
 
 // metric.HandlerBuilder#SetMetricTypes
 func (b *builder) SetMetricTypes(types map[string]*metric.Type) {
-	b.metricTypes = types
 }
 
 ////////////////// Request-time Methods //////////////////////////
@@ -132,15 +132,34 @@ func (h *handler) buildMetric(dimensions map[string]interface{}) *discovery.Metr
 	for key, value := range dimensions {
 		switch key {
 		case "source_ip":
-			builder = builder.WithSource(value.(string))
+			v, ok := value.(string)
+			if !ok {
+				return h.bld.metricHandler.NewMetricBuilder()
+			}
+			builder = builder.WithSource(v)
 		case "destination_ip":
-			builder = builder.WithDestination(value.(string))
+			v, ok := value.(string)
+			if !ok {
+				return h.bld.metricHandler.NewMetricBuilder()
+			}
+			builder = builder.WithDestination(v)
 		case "req_size":
-			builder = builder.WithTransmittedAmount(value.(int64))
+			v, ok := value.(int64)
+			if !ok {
+				return h.bld.metricHandler.NewMetricBuilder()
+			}
+			builder = builder.WithTransmittedAmount(v)
 		case "resp_size":
-			builder = builder.WithReceivedAmount(value.(int64))
+			v, ok := value.(int64)
+			if !ok {
+				return h.bld.metricHandler.NewMetricBuilder()
+			}
+			builder = builder.WithReceivedAmount(v)
 		case "latency":
-			duration := value.(time.Duration)
+			duration, ok := value.(time.Duration)
+			if !ok {
+				return h.bld.metricHandler.NewMetricBuilder()
+			}
 			builder = builder.WithDuration(int(duration.Nanoseconds() / 1000))
 		}
 	}
