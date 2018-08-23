@@ -5,7 +5,7 @@ metadata:
   name: turbotest
   namespace: istio-system
 spec:
-  url: "https://<host>[:<port>]"
+  url: "https://<Turbonomic host>[:<port>]"
   user: "<Turbonomic administrator>"
   password: "<Turbonomic administrator password>"
   target_version: "<Turbonomic version>"
