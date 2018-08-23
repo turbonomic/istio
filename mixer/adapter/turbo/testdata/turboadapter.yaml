@@ -5,11 +5,11 @@ metadata:
   name: turbotest
   namespace: istio-system
 spec:
-  url: "https://10.10.174.127"
-  user: "administrator"
-  password: "a"
-  target_version: "6.2.0-SNAPSHOT"
-  adapter_id: "TestMe"
+  url: "https://<host>[:<port>]"
+  user: "<Turbonomic administrator>"
+  password: "<Turbonomic administrator password>"
+  target_version: "<Turbonomic version>"
+  adapter_id: "<The unique identifier for this Mixer adapter>"
 ---
 # handler configuration for adapter 'metric'
 apiVersion: "config.istio.io/v1alpha2"
