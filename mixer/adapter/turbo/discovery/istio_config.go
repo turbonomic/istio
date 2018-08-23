@@ -5,7 +5,6 @@ import (
 	"fmt"
 
 	"github.com/turbonomic/turbo-go-sdk/pkg/service"
-	"os"
 )
 
 const (
@@ -28,7 +27,7 @@ type IstioTAPServiceSpec struct {
 	*IstioTargetConfig                `json:"targetConfig,omitempty"`
 }
 
-func ParseTurboCommunicationConfig(configFile string) (*IstioTAPServiceSpec, error) {
+func ParseTurboCommunicationConfig(configFile string, id string) (*IstioTAPServiceSpec, error) {
 	// load the config
 	turboCommConfig, err := readTurboCommunicationConfig(configFile)
 	if err != nil {
@@ -38,12 +37,7 @@ func ParseTurboCommunicationConfig(configFile string) (*IstioTAPServiceSpec, err
 		return nil, err
 	}
 	// The target config.
-	// Use host name to identify the target.
-	host, errHost := os.Hostname()
-	if errHost != nil {
-		return nil, err
-	}
-	targetId := TargetType + "-ncm-" + host
+	targetId := TargetType + "-ncm-" + id
 	turboCommConfig.IstioTargetConfig = &IstioTargetConfig{
 		TargetIdentifier: targetId,
 		TargetType:       TargetType,
