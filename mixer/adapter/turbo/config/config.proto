@@ -24,12 +24,15 @@ message Params {
     // The Turbo URL
     string url = 1;
 
-    // The admin user name
+    // The turbonomic admin user name
     string user = 2;
 
-    // The admin password
+    // The turbonomic admin password
     string password = 3;
 
-    // The target version
+    // The turbonomic version
     string target_version = 4;
+
+    // The Istio mixer adapter id
+    string adapter_id = 5;
 }

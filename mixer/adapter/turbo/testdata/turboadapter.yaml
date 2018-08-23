@@ -5,26 +5,77 @@ metadata:
   name: turbotest
   namespace: istio-system
 spec:
-  url: "https://localhost:9400"
+  url: "https://10.10.174.127"
   user: "administrator"
   password: "a"
   target_version: "6.2.0-SNAPSHOT"
+  adapter_id: "TestMe"
 ---
 # handler configuration for adapter 'metric'
 apiVersion: "config.istio.io/v1alpha2"
 kind: metric
 metadata:
-  name: turbometrics
+  name: latency
   namespace: istio-system
 spec:
-  value: "1"
+  value: response.duration | "0ms"
   dimensions:
-    latency: response.duration | "0ms"
-    req_size: request.size | 0
-    resp_size: response.size | 0
-    source_ip: source.ip | ip("0.0.0.0")
-    destination_ip: destination.ip | ip("0.0.0.0")
-  monitored_resource_type: '"UNSPECIFIED"'
+    source: source.labels["app"] | source.service | "unknown"
+    sourceVersion: source.labels["version"] | "unknown"
+    destination: destination.labels["app"] | destination.service | "unknown"
+    destinationVersion: destination.labels["version"] | "unknown"
+---
+apiVersion: "config.istio.io/v1alpha2"
+kind: metric
+metadata:
+  name: reqsize
+  namespace: istio-system
+spec:
+  value: request.size | 0
+  dimensions:
+    source: source.labels["app"] | source.service | "unknown"
+    sourceVersion: source.labels["version"] | "unknown"
+    destination: destination.labels["app"] | destination.service | "unknown"
+    destinationVersion: destination.labels["version"] | "unknown"
+---
+apiVersion: "config.istio.io/v1alpha2"
+kind: metric
+metadata:
+  name: respsize
+  namespace: istio-system
+spec:
+  value: response.size | 0
+  dimensions:
+    source: source.labels["app"] | source.service | "unknown"
+    sourceVersion: source.labels["version"] | "unknown"
+    destination: destination.labels["app"] | destination.service | "unknown"
+    destinationVersion: destination.labels["version"] | "unknown"
+---
+apiVersion: "config.istio.io/v1alpha2"
+kind: metric
+metadata:
+  name: srcip
+  namespace: istio-system
+spec:
+  value: source.ip | ip("0.0.0.0")
+  dimensions:
+    source: source.labels["app"] | source.service | "unknown"
+    sourceVersion: source.labels["version"] | "unknown"
+    destination: destination.labels["app"] | destination.service | "unknown"
+    destinationVersion: destination.labels["version"] | "unknown"
+---
+apiVersion: "config.istio.io/v1alpha2"
+kind: metric
+metadata:
+  name: dstip
+  namespace: istio-system
+spec:
+  value: destination.ip | ip("0.0.0.0")
+  dimensions:
+    source: source.labels["app"] | source.service | "unknown"
+    sourceVersion: source.labels["version"] | "unknown"
+    destination: destination.labels["app"] | destination.service | "unknown"
+    destinationVersion: destination.labels["version"] | "unknown"
 ---
 # rule to dispatch to your handler
 apiVersion: "config.istio.io/v1alpha2"
@@ -37,7 +88,11 @@ spec:
   actions:
   - handler: turbotest.turbo
     instances:
-    - turbometrics.metric
+    - latency.metric
+    - reqsize.metric
+    - respsize.metric
+    - srcip.metric
+    - dstip.metric
 ---
 apiVersion: "config.istio.io/v1alpha2"
 kind: attributemanifest

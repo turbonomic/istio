@@ -5,9 +5,6 @@ import (
 	"context"
 	"fmt"
 	"os"
-	"os/signal"
-	"syscall"
-
 	"istio.io/istio/mixer/adapter/turbo/config"
 	"istio.io/istio/mixer/adapter/turbo/discovery"
 	"istio.io/istio/mixer/pkg/adapter"
@@ -15,6 +12,7 @@ import (
 	"time"
 	"strings"
 	"github.com/pkg/errors"
+	"net"
 )
 
 const (
@@ -72,8 +70,6 @@ func (b *builder) Build(ctx context.Context, env adapter.Env) (adapter.Handler, 
 		return nil, err
 	}
 	b.tapSvc = tapSvc
-	// Disconnect from Turbonomic server when mixer is shutdown
-	handleExit(func() { tapSvc.DisconnectFromTurbo() })
 	// Connect
 	go tapSvc.ConnectToTurbo()
 	return &handler{
@@ -87,24 +83,6 @@ func (b *builder) SetAdapterConfig(cfg adapter.Config) {
 	b.cfg = cfg.(*config.Params)
 }
 
-// handleExit disconnects the tap service from Turbo service when Istio is shutdown
-func handleExit(disconnectFunc disconnectFromTurboFunc) {
-	sigChan := make(chan os.Signal)
-	signal.Notify(sigChan,
-		os.Interrupt,
-		syscall.SIGTERM,
-		syscall.SIGINT,
-		syscall.SIGQUIT,
-		syscall.SIGHUP)
-
-	go func() {
-		select {
-		case <-sigChan:
-			disconnectFunc()
-		}
-	}()
-}
-
 // Parses the TAP service spec.
 // Constructs the JSON, and then parses it.
 func (b *builder) parseConfig() (*discovery.IstioTAPServiceSpec, error) {
@@ -112,7 +90,7 @@ func (b *builder) parseConfig() (*discovery.IstioTAPServiceSpec, error) {
                                         "serverMeta": {"version": "%s", "turboServer": "%s"}, 
                                         "restAPIConfig": {"opsManagerUserName": "%s", "opsManagerPassword": "%s"}
                                    }}`, b.cfg.TargetVersion, b.cfg.Url, b.cfg.User, b.cfg.Password)
-	return discovery.ParseTurboCommunicationConfig(cfgMap)
+	return discovery.ParseTurboCommunicationConfig(cfgMap, b.cfg.AdapterId)
 }
 
 // adapter.HandlerBuilder#Validate
@@ -127,54 +105,52 @@ func (b *builder) SetMetricTypes(types map[string]*metric.Type) {
 ////////////////// Request-time Methods //////////////////////////
 
 // Builds the metric
-func (h *handler) buildMetric(dimensions map[string]interface{}) *discovery.Metric {
-	builder := h.bld.metricHandler.NewMetricBuilder()
-	for key, value := range dimensions {
-		switch key {
-		case "source_ip":
-			v, ok := value.(string)
-			if !ok {
-				return h.bld.metricHandler.NewMetricBuilder()
-			}
-			builder = builder.WithSource(v)
-		case "destination_ip":
-			v, ok := value.(string)
-			if !ok {
-				return h.bld.metricHandler.NewMetricBuilder()
-			}
-			builder = builder.WithDestination(v)
-		case "req_size":
-			v, ok := value.(int64)
-			if !ok {
-				return h.bld.metricHandler.NewMetricBuilder()
-			}
-			builder = builder.WithTransmittedAmount(v)
-		case "resp_size":
-			v, ok := value.(int64)
-			if !ok {
-				return h.bld.metricHandler.NewMetricBuilder()
-			}
-			builder = builder.WithReceivedAmount(v)
-		case "latency":
-			duration, ok := value.(time.Duration)
-			if !ok {
-				return h.bld.metricHandler.NewMetricBuilder()
-			}
-			builder = builder.WithDuration(int(duration.Nanoseconds() / 1000))
+func (h *handler) buildMetric(name string, value interface{}, builder *discovery.Metric) *discovery.Metric {
+	switch name {
+	case "srcip.metric.istio-system":
+		v, ok := value.(net.IP)
+		if !ok {
+			return h.bld.metricHandler.NewMetricBuilder()
 		}
+		builder = builder.WithSource(v.String())
+	case "dstip.metric.istio-system":
+		v, ok := value.(net.IP)
+		if !ok {
+			return h.bld.metricHandler.NewMetricBuilder()
+		}
+		builder = builder.WithDestination(v.String())
+	case "reqsize.metric.istio-system":
+		v, ok := value.(int64)
+		if !ok {
+			return h.bld.metricHandler.NewMetricBuilder()
+		}
+		builder = builder.WithTransmittedAmount(v)
+	case "respsize.metric.istio-system":
+		v, ok := value.(int64)
+		if !ok {
+			return h.bld.metricHandler.NewMetricBuilder()
+		}
+		builder = builder.WithReceivedAmount(v)
+	case "latency.metric.istio-system":
+		duration, ok := value.(time.Duration)
+		if !ok {
+			return h.bld.metricHandler.NewMetricBuilder()
+		}
+		builder = builder.WithDuration(int(duration.Nanoseconds() / 1000))
 	}
 	return builder
 }
 
 // metric.Handler#HandleMetric
 func (h *handler) HandleMetric(ctx context.Context, insts []*metric.Instance) error {
+	builder := h.bld.metricHandler.NewMetricBuilder()
 	for _, inst := range insts {
-		if m, err := h.buildMetric(inst.Dimensions).Create(); err != nil {
-			h.logger.Errorf("Error building metric %s", err)
-			return err
-		} else {
-			h.bld.metricHandler.Add(m)
-		}
+		builder = h.buildMetric(inst.Name, inst.Value, builder)
+	}
+	if m, err := builder.Create(); err != nil {
+		h.logger.Errorf("Error building metric %s", err)
+	} else {
+		h.bld.metricHandler.Add(m)
 	}
 	return nil
 }
