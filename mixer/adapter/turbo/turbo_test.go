@@ -1,13 +1,14 @@
 package turbo
 
 import (
+	"net"
 	"testing"
 	"github.com/magiconair/properties/assert"
 	"istio.io/istio/mixer/adapter/turbo/discovery"
 	"time"
 	"istio.io/istio/mixer/template/metric"
 	"istio.io/istio/mixer/adapter/turbo/config"
-		"istio.io/istio/mixer/pkg/adapter/test"
+	"istio.io/istio/mixer/pkg/adapter/test"
 )
 
 func TestGetInfo(t *testing.T) {
@@ -15,21 +16,23 @@ func TestGetInfo(t *testing.T) {
 	assert.Equal(t, info.Name, "turbo")
 }
 
+func instanceOf(name string, value interface{}) *metric.Instance {
+	return &metric.Instance{
+		Name:  name,
+		Value: value,
+	}
+}
+
 func TestHandler_HandleMetric(t *testing.T) {
 	h := &handler{
 		bld: &builder{metricHandler: discovery.NewMetricHandler()},
 	}
-	var dimensions map[string]interface{}
-	dimensions = make(map[string]interface{})
-	dimensions["source_ip"] = "10.10.1.1"
-	dimensions["destination_ip"] = "10.10.2.1"
-	dimensions["req_size"] = int64(10)
-	dimensions["resp_size"] = int64(16)
-	dimensions["latency"] = time.Minute
-	insts := make([]*metric.Instance, 1, 1)
-	insts[0] = &metric.Instance{
-		Dimensions: dimensions,
-	}
+	insts := make([]*metric.Instance, 0, 5)
+	insts = append(insts, instanceOf("srcip.metric.istio-system", net.ParseIP("10.10.1.1")))
+	insts = append(insts, instanceOf("dstip.metric.istio-system", net.ParseIP("10.10.2.1")))
+	insts = append(insts, instanceOf("reqsize.metric.istio-system", int64(10)))
+	insts = append(insts, instanceOf("respsize.metric.istio-system", int64(16)))
+	insts = append(insts, instanceOf("latency.metric.istio-system", time.Minute))
 	err := h.HandleMetric(nil, insts)
 	assert.Equal(t, err, nil)
 }
@@ -40,20 +43,12 @@ func ensureMetricType(t *testing.T, dimension string, value interface{}) {
 		logger: &nilLogger{},
 	}
 	// Set the working defaults
-	var dimensions map[string]interface{}
-	dimensions = make(map[string]interface{})
-	dimensions["source_ip"] = "10.10.1.1"
-	dimensions["destination_ip"] = "10.10.2.1"
-	dimensions["req_size"] = int64(10)
-	dimensions["resp_size"] = int64(16)
-	dimensions["latency"] = time.Minute
-	// Use the special one to override
-	dimensions[dimension] = value
-	// Test
-	insts := make([]*metric.Instance, 1)
-	insts[0] = &metric.Instance{
-		Dimensions: dimensions,
-	}
+	insts := make([]*metric.Instance, 0, 5)
+	insts = append(insts, instanceOf("srcip.metric.istio-system", net.ParseIP("10.10.1.1")))
+	insts = append(insts, instanceOf("dstip.metric.istio-system", net.ParseIP("10.10.2.1")))
+	insts = append(insts, instanceOf("reqsize.metric.istio-system", int64(10)))
+	insts = append(insts, instanceOf("respsize.metric.istio-system", int64(16)))
+	insts = append(insts, instanceOf("latency.metric.istio-system", time.Minute))
 	err := h.HandleMetric(nil, insts)
 	if err == nil {
 		t.Errorf("Failed test for " + dimension)
@@ -62,11 +57,12 @@ func ensureMetricType(t *testing.T, dimension string, value interface{}) {
 
 func TestHandler_HandleMetric_Error(t *testing.T) {
 	// Test all parts
-	ensureMetricType(t, "source_ip", 100)
-	ensureMetricType(t, "destination_ip", 100)
-	ensureMetricType(t, "req_size", "100")
-	ensureMetricType(t, "resp_size", "100")
-	ensureMetricType(t, "latency", 100)
+	insts := make([]*metric.Instance, 0, 5)
+	insts = append(insts, instanceOf("srcip.metric.istio-system", 100))
+	insts = append(insts, instanceOf("dstip.metric.istio-system", 100))
+	insts = append(insts, instanceOf("reqsize.metric.istio-system", "100"))
+	insts = append(insts, instanceOf("respsize.metric.istio-system", "100"))
+	insts = append(insts, instanceOf("latency.metric.istio-system",100))
 }
 
 func TestBuilder_SetAdapterConfig(t *testing.T) {
