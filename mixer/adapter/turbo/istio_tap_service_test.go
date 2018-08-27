@@ -22,7 +22,7 @@ func TestNewIstioTAPService(t *testing.T) {
                                         "serverMeta": {"version": "1", "turboServer": "https://localhost"}, 
                                         "restAPIConfig": {"opsManagerUserName": "user", "opsManagerPassword": "pswd"}
                                    }}`)
-	tapSpec, err := discovery.ParseTurboCommunicationConfig(cfgMap)
+	tapSpec, err := discovery.ParseTurboCommunicationConfig(cfgMap, "id")
 	cfg := NewVMTConfig().WithMetricHandler(discovery.NewMetricHandler()).
 		WithDiscoveryInterval(100).
 		WithTapSpec(tapSpec)

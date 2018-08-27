@@ -20,7 +20,7 @@ func TestIstioDiscoveryClient_GetAccountValues(t *testing.T) {
                                         "serverMeta": {"version": "1", "turboServer": "https://localhost"}, 
                                         "restAPIConfig": {"opsManagerUserName": "user", "opsManagerPassword": "pswd"}
                                    }}`)
-	svc, _ := ParseTurboCommunicationConfig(cfgMap)
+	svc, _ := ParseTurboCommunicationConfig(cfgMap, "id")
 	client := NewIstioDiscoveryClient(svc, nil)
 	if client == nil {
 		t.Errorf("Client must not be nil")
@@ -68,7 +68,7 @@ func TestIstioDiscoveryClient_Discover(t *testing.T) {
                                         "serverMeta": {"version": "1", "turboServer": "https://localhost"}, 
                                         "restAPIConfig": {"opsManagerUserName": "user", "opsManagerPassword": "pswd"}
                                    }}`)
-	svc, _ := ParseTurboCommunicationConfig(cfgMap)
+	svc, _ := ParseTurboCommunicationConfig(cfgMap, "id")
 	client := NewIstioDiscoveryClient(svc, NewMetricHandler())
 	constructMetrics(client.metricHandler)
 	var accountValues []*proto.AccountValue

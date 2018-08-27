@@ -8,7 +8,7 @@ import (
 )
 
 func TestBadInput(t *testing.T) {
-	svc, err := ParseTurboCommunicationConfig("hello")
+	svc, err := ParseTurboCommunicationConfig("hello", "id")
 	if svc != nil {
 		t.Errorf("There should not have been a service")
 	}
@@ -22,7 +22,7 @@ func TestBadServer(t *testing.T) {
                                         "serverMeta": {"version": "1", "turboServer": "local"}, 
                                         "restAPIConfig": {"opsManagerUserName": "user", "opsManagerPassword": "pswd"}
                                    }}`)
-	svc, err := ParseTurboCommunicationConfig(cfgMap)
+	svc, err := ParseTurboCommunicationConfig(cfgMap, "id")
 	if svc != nil || err == nil {
 		t.Errorf("Should have been an error due to a wrong input")
 	}
@@ -33,7 +33,7 @@ func TestGoodInput(t *testing.T) {
                                         "serverMeta": {"version": "1", "turboServer": "https://localhost"}, 
                                         "restAPIConfig": {"opsManagerUserName": "user", "opsManagerPassword": "pswd"}
                                    }}`)
-	svc, err := ParseTurboCommunicationConfig(cfgMap)
+	svc, err := ParseTurboCommunicationConfig(cfgMap, "istio-telemetry")
 	if svc == nil || err != nil {
 		t.Errorf("Should have been an error due to a wrong input")
 	}
