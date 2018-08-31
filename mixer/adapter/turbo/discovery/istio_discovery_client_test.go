@@ -1,6 +1,7 @@
 package discovery
 
 import (
+	"math"
 	"testing"
 	"github.com/magiconair/properties/assert"
 	"fmt"
@@ -75,4 +76,15 @@ func TestIstioDiscoveryClient_Discover(t *testing.T) {
 	response, err := client.Discover(accountValues)
 	assert.Equal(t, err, nil)
 	assert.Equal(t, len(response.FlowDTO), 1)
+}
+
+func TestAmount(t *testing.T) {
+	amount := 10000.
+	duration := 120.
+
+	kbps1 := (amount / 1024.) / (duration / 1000.)
+	kbps2 := (amount / duration) / (1024. / 1000.)
+	kbps3 := (amount / duration) / (KBPS)
+	assert.Equal(t, true, math.Abs(kbps1 - kbps2) < 0.0000000001)
+	assert.Equal(t, kbps2, kbps3)
 }

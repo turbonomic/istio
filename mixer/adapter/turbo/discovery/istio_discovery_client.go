@@ -9,8 +9,8 @@ import (
 )
 
 const (
-	// KBPS
-	KBPS = 1024 * 60
+	// KBPS conversion
+	KBPS = 1.024
 	// Default destination port
 	DEFAULT_DESTINATION_PORT = 8080
 )
@@ -77,6 +77,8 @@ func (client *IstioDiscoveryClient) Discover(accountValues []*proto.AccountValue
 }
 
 // Perform the discovery
+// The amount is in bytes. The duration is in ms.
+// We need KB/s - (amount / 1024) / (duration / 1000)
 func (client *IstioDiscoveryClient) doDiscover() ([]*proto.FlowDTO, error) {
 	var flows []*proto.FlowDTO
 	metrics := client.metricHandler.GetMetrics()

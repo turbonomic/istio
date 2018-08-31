@@ -136,7 +136,7 @@ func (h *handler) buildMetric(name string, value interface{}, builder *discovery
 		if !ok {
 			return h.bld.metricHandler.NewMetricBuilder()
 		}
-		builder = builder.WithDuration(int(duration.Nanoseconds() / 1000))
+		builder = builder.WithDuration(int(duration.Nanoseconds() / 1000000))
 	}
 	return builder
 }
